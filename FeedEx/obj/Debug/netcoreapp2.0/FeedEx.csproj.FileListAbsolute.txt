@@ -1,0 +1,11 @@
+D:\DEVELOPMENT\github\FeedEx\Prototype\FeedEx\FeedEx\obj\Debug\netcoreapp2.0\FeedEx.csprojResolveAssemblyReference.cache
+D:\DEVELOPMENT\github\FeedEx\Prototype\FeedEx\FeedEx\obj\Debug\netcoreapp2.0\FeedEx.csproj.CoreCompileInputs.cache
+D:\DEVELOPMENT\github\FeedEx\Prototype\FeedEx\FeedEx\obj\Debug\netcoreapp2.0\FeedEx.AssemblyInfoInputs.cache
+D:\DEVELOPMENT\github\FeedEx\Prototype\FeedEx\FeedEx\obj\Debug\netcoreapp2.0\FeedEx.AssemblyInfo.cs
+D:\DEVELOPMENT\github\FeedEx\Prototype\FeedEx\FeedEx\bin\Debug\netcoreapp2.0\FeedEx.deps.json
+D:\DEVELOPMENT\github\FeedEx\Prototype\FeedEx\FeedEx\bin\Debug\netcoreapp2.0\FeedEx.runtimeconfig.json
+D:\DEVELOPMENT\github\FeedEx\Prototype\FeedEx\FeedEx\bin\Debug\netcoreapp2.0\FeedEx.runtimeconfig.dev.json
+D:\DEVELOPMENT\github\FeedEx\Prototype\FeedEx\FeedEx\bin\Debug\netcoreapp2.0\FeedEx.dll
+D:\DEVELOPMENT\github\FeedEx\Prototype\FeedEx\FeedEx\bin\Debug\netcoreapp2.0\FeedEx.pdb
+D:\DEVELOPMENT\github\FeedEx\Prototype\FeedEx\FeedEx\obj\Debug\netcoreapp2.0\FeedEx.dll
+D:\DEVELOPMENT\github\FeedEx\Prototype\FeedEx\FeedEx\obj\Debug\netcoreapp2.0\FeedEx.pdb
