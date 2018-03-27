@@ -65,7 +65,13 @@ namespace FeedEx
                         Tweets.Add(new Tuple<string, string>(username, tweet.Substring(0, length)));
                     }
                 }
+
+                var Followers = Users.SelectMany(i => i.Item2).Distinct().ToArray();
+                var onlyFollowers = Followers.Where(f => !Users.Select(u => u.Item1).Contains(f));
+
+
                 return watch.ElapsedMilliseconds;
+
             }
 
             public long Render()
@@ -89,9 +95,8 @@ namespace FeedEx
         static void Main(string[] args)
         {            
             Console.OutputEncoding = Encoding.UTF8;
-            string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-            Console.WriteLine($"Welcome to a twitter-feed examlple! \nRunning in {environment} mode.\nPress any key to continue...");
+            Console.WriteLine($"Welcome to a twitter-feed examlple!\nPress any key to continue...");
             Console.ReadKey(true);
             
             string[] txtUsers, txtTweets;
@@ -119,12 +124,6 @@ namespace FeedEx
             FeedBuilder builder = new FeedBuilder();
 
             long BuildTime = builder.Build(ref txtUsers, ref txtTweets);
-            
-
-            // var allFollowers = Users.SelectMany(i => i.Item2).Distinct().ToArray();
-            // var onlyFollowers = allFollowers.Where(f => !Users.Select(u => u.Item1).Contains(f));
-            
-
             long RenderTime = builder.Render();
 
             Console.WriteLine("----------------------1981----------------------");
