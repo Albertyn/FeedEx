@@ -46,6 +46,22 @@ namespace FeedEx
                         follows = line.Substring(index + 7).Replace(" ", "").Split(",");
 
                         Users.Add(new Tuple<string, string[]>(username, follows));
+                        
+                        /*
+                        try
+                        {
+                            // determine if the user already appears in the master list.
+                            // There should not be multiple instances of the same user in the array - Single() will throw an exeption!
+                            var Temp = Users.Where(u => u.Item1.ToLower() == username.ToLower()).Single();
+
+                            // Union to determine the users they follow
+                            Temp = new Tuple<string, string[]>(username, Temp.Item2.Concat(follows).Distinct().ToArray());
+                        }
+                        catch
+                        {
+                            Users.Add(new Tuple<string, string[]>(username, follows));
+                        }
+                        */
                     }
                 }
                 for (int i = 0; i < txtTweets.Length; i++)
@@ -66,9 +82,8 @@ namespace FeedEx
                     }
                 }
 
-                var Followers = Users.SelectMany(i => i.Item2).Distinct().ToArray();
-                var onlyFollowers = Followers.Where(f => !Users.Select(u => u.Item1).Contains(f));
-
+//                var Followers = Users.SelectMany(i => i.Item2).Distinct().ToArray();
+//                var onlyFollowers = Followers.Where(f => !Users.Select(u => u.Item1).Contains(f));
 
                 return watch.ElapsedMilliseconds;
 
@@ -100,6 +115,7 @@ namespace FeedEx
             Console.ReadKey(true);
             
             string[] txtUsers, txtTweets;
+            long BuildTime, RenderTime;
 
             try
             {
@@ -121,15 +137,23 @@ namespace FeedEx
                 return;
             }
 
+            Console.WriteLine("----------------------1981----------------------");
             FeedBuilder builder = new FeedBuilder();
 
-            long BuildTime = builder.Build(ref txtUsers, ref txtTweets);
-            long RenderTime = builder.Render();
+            BuildTime = builder.Build(ref txtUsers, ref txtTweets);
+            RenderTime = builder.Render();
 
-            Console.WriteLine("----------------------1981----------------------");
             Console.WriteLine($"BuildTime: {BuildTime}ms");
             Console.WriteLine($"BuildTime: {RenderTime}ms");
 
+
+            Console.WriteLine("----------------------2005----------------------");
+            FB fb = new FB();
+            BuildTime = builder.Build(ref txtUsers, ref txtTweets);
+            RenderTime = builder.Render();
+
+            Console.WriteLine($"BuildTime: {BuildTime}ms");
+            Console.WriteLine($"BuildTime: {RenderTime}ms");
 
             // Keep the console window open in debug mode.
             Console.WriteLine("Press any key to exit.");
@@ -140,17 +164,19 @@ namespace FeedEx
         {
             public string Name { get; set; }
             public string[] Follows { get; set; }
-            public string[] Tweets { get; set; }
+            public List<string> Tweets { get; set; }
         }
         class FB
         {
             public TwitterUser TempUser { get; private set; }
             public List<TwitterUser> UserList { get; private set; }
 
-            public FB(ref string[] txtUsers, ref string[] txtTweets)
+            public long Build(ref string[] txtUsers, ref string[] txtTweets)
             {
-                int index;
-                string username;
+                Stopwatch watch = Stopwatch.StartNew();
+
+                int index, length;
+                string username, tweet;
                 string[] following;
 
                 foreach (string line in txtUsers)
@@ -180,6 +206,43 @@ namespace FeedEx
                         }
                     }
                 }
+                
+                foreach (string line in txtTweets)
+                {
+                    index = line.ToLower().IndexOf(">");
+
+                    // check for well formed line. 
+                    if (index > 0)
+                    {
+                        username = line.Substring(0, index).Trim();
+                        tweet = line.Substring(index + 1); // thanks for the breadcrumbs ;)
+
+                        // 2 determine length of string : prevent index out of range ex.
+                        length = (tweet.Length > 140) ? 140 : tweet.Length - 1;
+                        var x = UserList.Where(u => u.Name == username).Single().Tweets;
+                        if(x == null) x = new List<string>();
+                        x.Add(tweet.Substring(0, length));
+
+                        // Tweets.Add(new Tuple<string, string>(username, tweet.Substring(0, length)));
+                    }
+                }
+                return watch.ElapsedMilliseconds;
+            }
+            public long Render()
+            {
+                Stopwatch watch = Stopwatch.StartNew();
+
+                // Display the file contents by using a foreach loop.
+                foreach (var tu in UserList.OrderBy(tu => tu.Name))
+                {
+                    Console.Write($"@{tu.Name}");
+                    Console.WriteLine($"\t follows {string.Join("|", tu.Follows)}");
+
+                    foreach (var t in tu.Tweets)
+                        Console.WriteLine($"\t @{tu.Name}: {t}");
+                }
+
+                return watch.ElapsedMilliseconds;
             }
         }
 
