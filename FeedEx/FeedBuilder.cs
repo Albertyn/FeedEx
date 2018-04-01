@@ -9,20 +9,19 @@ using System.Diagnostics;
 namespace FeedEx
 {        class FeedBuilder
         {
-            // Step 1 : Read Data into structures that are enumerable/queryable and stable
-            
-            public List<Tuple<string, string[], string[]>> Feed { get; private set; }
+            // Step 1 : Read Data into structures that are enumerable/queryable and stable            
             public List<Tuple<string, string[]>> Users { get; private set; }
             public List<Tuple<string, string>> Tweets { get; private set; }
 
-            public long Build(ref string[] txtUsers, ref string[] txtTweets)
+            public void Build(ref string[] txtUsers, ref string[] txtTweets, bool Timer = false)
             {
                 Stopwatch watch = Stopwatch.StartNew();
-
-                Feed = new List<Tuple<string, string[], string[]>>(); // username / username[] (followers)  / tweet[]
+                
                 Users = new List<Tuple<string, string[]>>(); // username / username[] (followers) 
                 Tweets = new List<Tuple<string, string>>(); // username / tweet
 
+                List<Tuple<string, string[]>> Feed = new List<Tuple<string, string[]>>();
+                
                 int index, length;
                 string line, username, tweet;
                 string[] follows, uqnames;
@@ -46,6 +45,7 @@ namespace FeedEx
                         Tweets.Add(new Tuple<string, string>(username, tweet.Substring(0, length)));
                     }
                 }
+
                 for (int i = 0; i < txtUsers.Length; i++) // Build Master Index for Output
                 {
                     line = txtUsers[i];
@@ -59,43 +59,41 @@ namespace FeedEx
                         username = line.Substring(0, index).Trim();
                         follows = line.Substring(index + 7).Replace(" ", "").Split(",");
 
-                        Users.Add(new Tuple<string, string[]>(username, follows));
+                        Feed.Add(new Tuple<string, string[]>(username, follows));
                     }
                 }
+
                 // 3. Get List of unique usernames
-                uqnames = (Users.Select(i => i.Item1).Concat(Users.SelectMany(u => u.Item2))).Distinct().ToArray();
+                uqnames = (Feed.Select(i => i.Item1).Concat(Feed.SelectMany(u => u.Item2))).Distinct().ToArray();
+                
                 // 4. Initialize Feed
                 for(int i = 0; i < uqnames.Length; i++)
                 {
-                    follows = Users.Where(u => u.Item1 == uqnames[i]).SelectMany(u => u.Item2).Distinct().ToArray();
+                    follows = (Feed.Where(u => u.Item1 == uqnames[i])).SelectMany(u => u.Item2).Distinct().ToArray();
                     
-                    Feed.Add(
-                        new Tuple<string, string[], string[]>(
-                            uqnames[i], 
-                            follows,
-                            Tweets.Where(t => t.Item1 == uqnames[i] || follows.Contains(t.Item1))
-                                .Select(t => t.Item2).ToArray()
-                            )
-                        );
+                    Users.Add(new Tuple<string, string[]>(uqnames[i], follows));
                 }
-                return watch.ElapsedMilliseconds;
+
+                if (Timer) 
+                    Console.WriteLine($"Build() Time: {watch.ElapsedMilliseconds}ms | t:{watch.ElapsedTicks}\n");
             }
 
-            public long Render()
+            public void Render(bool Timer = false)
             {
                 Stopwatch watch = Stopwatch.StartNew();
 
                 // Display the file contents by using a foreach loop.
-                foreach (var tu in Feed.OrderBy(tu => tu.Item1))
+                foreach (var tu in Users.OrderBy(tu => tu.Item1))
                 {
-                    Console.Write($"@{tu.Item1}");
-                    Console.WriteLine($"\t follows {string.Join("|", tu.Item2)}");
+                    Console.WriteLine($"{tu.Item1}");
+                    // Console.WriteLine($"\t follows {string.Join("|", tu.Item2)}");
 
-                    foreach (var t in tu.Item3)
-                        Console.WriteLine($"\t @{tu.Item1}: {t}");
+                    foreach (var t in Tweets.Where(t => t.Item1 == tu.Item1 || tu.Item2.Contains(t.Item1)))
+                        Console.WriteLine($"\t @{t.Item1}: {t.Item2}");
                 }
 
-                return watch.ElapsedMilliseconds;
+                if (Timer) 
+                    Console.WriteLine($"\nRender() Time: {watch.ElapsedMilliseconds}ms | t:{watch.ElapsedTicks}");
             }
         }
 

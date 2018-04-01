@@ -12,91 +12,111 @@ namespace FeedEx
         {
             public string Name { get; set; }
             public string[] Follows { get; set; }
-            public List<string> Tweets { get; set; }
         }
-        class FB
+        public class Tweet
         {
-            public TwitterUser TempUser { get; private set; }
-            public List<TwitterUser> UserList { get; private set; }
-
-            public long Build(ref string[] txtUsers, ref string[] txtTweets)
+            public string Name { get; set; }
+            public string Message { get; set; }
+        }
+        class Bouwer
+        {
+            private static TwitterUser _TempUser = new TwitterUser();
+            string[] UserNames {
+                get
+                {
+                    return (UserList.Select(i => i.Name).Concat(UserList.SelectMany(u => u.Follows))).Distinct().ToArray();
+                }
+            }
+            List<TwitterUser> UserList { get; set; }
+            List<Tweet> TweetList { get; set; }
+            public void Build(ref string[] txtUsers, ref string[] txtTweets, bool Timer = false)
             {
                 Stopwatch watch = Stopwatch.StartNew();
 
-                List<TwitterUser> TempList = new List<TwitterUser>();
+                List<TwitterUser> _UserList = new List<TwitterUser>();
+                List<Tweet> _TweetList = new List<Tweet>();
 
-                int index, length;
-                string username, tweet;
-                string[] following, uqnames;
+                int _index, _length;
+                string _username, _tweet;
+                string[] _following;
 
                 foreach (string line in txtUsers)
                 {
-                    index = line.ToLower().IndexOf("follows");
+                    _index = line.ToLower().IndexOf("follows");
 
                     // check for well formed line. 
                     // 1.Delimiter exists in string. (if it's index is a positive number)
                     // 2.Delimiter not at frist position in string. (If this was true, there would be no substring to read as name)
-                    if (index > 0)
+                    if (_index > 0)
                     {
-                        username = line.Substring(0, index).Trim();
-                        following = line.Substring(index + 7).Replace(" ", "").Split(",");
+                        _username = line.Substring(0, _index).Trim();
+                        _following = line.Substring(_index + 7).Replace(" ", "").Split(",");
 
                         // determine if the user already appears in the master list.
                         try
                         {
                             // There should not be multiple instances of the same user in the array - Single() will throw an exeption!
-                            TempUser = UserList.Where(u => u.Name.ToLower() == username.ToLower()).Single();
+                            _TempUser = _UserList.Where(u => u.Name.ToLower() == _username.ToLower()).Single();
 
                             // Union to determine the users they follow
-                            TempUser.Follows = TempUser.Follows.Concat(following).Distinct().ToArray();
+                            _TempUser.Follows = _TempUser.Follows.Concat(_following).Distinct().ToArray();
                         }
                         catch
                         {
-                            UserList.Add(new TwitterUser { Name = username, Follows = following });
+                            _UserList.Add(new TwitterUser { Name = _username, Follows = _following });
                         }
                     }
                 }
-                uqnames = UserList.Select(i => i.Name).Concat(UserList.SelectMany(u => u.Follows)).Distinct().ToArray();
-                //var uqUsers = UserList.Select(i => i.Name);
-                //var uqFollowers = UserList.SelectMany(u => u.Follows);//.Where(f => !uqUsers.Contains(f));
-                //var allUsers = uqUsers.Concat(uqFollowers).Distinct()
                 
                 foreach (string line in txtTweets)
                 {
-                    index = line.ToLower().IndexOf(">");
-
-                    // check for well formed line. 
-                    if (index > 0)
+                    try
                     {
-                        username = line.Substring(0, index).Trim();
-                        tweet = line.Substring(index + 1); // thanks for the breadcrumbs ;)
+                        _index = line.IndexOf(">");
 
-                        // 2 determine length of string : prevent index out of range ex.
-                        length = (tweet.Length > 140) ? 140 : tweet.Length - 1;
-                        var x = UserList.Where(u => u.Name == username).Single().Tweets;
-                        if(x == null) x = new List<string>();
-                        x.Add(tweet.Substring(0, length));
+                        // check for well formed line. 
+                        if (_index > 0)
+                        {
+                            _username = line.Substring(0, _index).Trim();
+                            _tweet = line.Substring(_index + 1); // thanks for the breadcrumbs ;)
 
-                        // Tweets.Add(new Tuple<string, string>(username, tweet.Substring(0, length)));
+                            // 2 determine length of string : prevent index out of range ex.
+                            _length = (_tweet.Length > 140) ? 140 : _tweet.Length - 1;
+                            // Assumes messages appear in sequence
+                            _TweetList.Add(new Tweet{ Name = _username, Message = _tweet});
+                        }
+                        else throw new Exception($"No delimiter or user: Line({Array.IndexOf(txtTweets, line)}) ");
+                    }
+                    catch(Exception e)
+                    { 
+                        Console.WriteLine($"Error processing line in Tweets > {e.Message}");
                     }
                 }
-                return watch.ElapsedMilliseconds;
+
+                this.UserList = _UserList;
+                this.TweetList = _TweetList;
+
+                if (Timer) 
+                    Console.WriteLine($"Build() Time: {watch.ElapsedMilliseconds}ms | t:{watch.ElapsedTicks}\n");
             }
-            public long Render()
+            public void Render(bool Timer = false)
             {
                 Stopwatch watch = Stopwatch.StartNew();
-
+                
                 // Display the file contents by using a foreach loop.
-                foreach (var tu in UserList.OrderBy(tu => tu.Name))
+                foreach (string user in UserNames.OrderBy(n => n))
                 {
-                    Console.Write($"@{tu.Name}");
-                    Console.WriteLine($"\t follows {string.Join("|", tu.Follows)}");
+                    Console.WriteLine(user);
 
-                    foreach (var t in tu.Tweets)
-                        Console.WriteLine($"\t @{tu.Name}: {t}");
+                    _TempUser = UserList.Where(u => u.Name == user).FirstOrDefault();
+                    // Console.WriteLine($"\t follows {string.Join("|", _TempUser.Follows)}");
+
+                    if (_TempUser != null)
+                        foreach (var t in TweetList.Where(u => u.Name == user || _TempUser.Follows.Contains(u.Name)))
+                        Console.WriteLine($"\t @{t.Name}: {t.Message}");
                 }
-
-                return watch.ElapsedMilliseconds;
+                if (Timer) 
+                    Console.WriteLine($"\nRender() Time: {watch.ElapsedMilliseconds}ms | t:{watch.ElapsedTicks}");
             }
         }
 }

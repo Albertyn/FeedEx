@@ -23,7 +23,6 @@ namespace FeedEx
             Console.ReadKey(true);
             
             string[] txtUsers, txtTweets;
-            long BuildTime, RenderTime;
 
             try
             {
@@ -47,21 +46,15 @@ namespace FeedEx
 
             Console.WriteLine("----------------------1981----------------------");
             FeedBuilder builder = new FeedBuilder();
-
-            BuildTime = builder.Build(ref txtUsers, ref txtTweets);
-            RenderTime = builder.Render();
-
-            Console.WriteLine($"BuildTime: {BuildTime}ms");
-            Console.WriteLine($"BuildTime: {RenderTime}ms");
+            builder.Build(ref txtUsers, ref txtTweets, true);
+            builder.Render(true);         
 
 
             Console.WriteLine("----------------------2005----------------------");
-            FB fb = new FB();
-            BuildTime = builder.Build(ref txtUsers, ref txtTweets);
-            RenderTime = builder.Render();
+            Bouwer bou = new Bouwer();
+            bou.Build(ref txtUsers, ref txtTweets, true);
+            bou.Render(true);
 
-            Console.WriteLine($"BuildTime: {BuildTime}ms");
-            Console.WriteLine($"BuildTime: {RenderTime}ms");
 
             // Keep the console window open in debug mode.
             Console.WriteLine("Press any key to exit.");
