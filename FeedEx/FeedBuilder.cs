@@ -37,7 +37,7 @@ namespace FeedEx
                     if (index > 0)
                     {
                         username = line.Substring(0, index).Trim();
-                        tweet = line.Substring(index + 1); // one space " ", thanks for the tip ;)
+                        tweet = line.Substring(index + 2); // one space " "  + 1 ;)
 
                         // 2. determine length of string : prevent index out of range ex.
                         length = (tweet.Length > 140) ? 140 : tweet.Length - 1;

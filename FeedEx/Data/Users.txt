@@ -1,3 +1,9 @@
 ﻿Ward follows Alan
 Alan follows Martin
 Ward follows Martin, Alan
+Conan follows Taylor, Oprah
+Taylor follows , Oprah
+Oprah follows  Oprah, Vladimir, Taylor
+Beyonce follows Oprah, Oprah
+Vladimir follows Taylor, Oprah, Conan
+Conan follows Taylor, Oprah, Vladimir

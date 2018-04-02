@@ -33,12 +33,13 @@ namespace FeedEx
             {
                 Stopwatch watch = Stopwatch.StartNew();
 
+                UserList = new List<TwitterUser>();
+                TweetList = new List<Tweet>();
                 List<TwitterUser> _UserList = new List<TwitterUser>();
-                List<Tweet> _TweetList = new List<Tweet>();
 
                 int _index, _length;
                 string _username, _tweet;
-                string[] _following;
+                string[] _following, _unique;
 
                 foreach (string line in txtUsers)
                 {
@@ -67,6 +68,14 @@ namespace FeedEx
                         }
                     }
                 }
+
+                _unique = (_UserList.Select(i => i.Name).Concat(_UserList.SelectMany(u => u.Follows))).Distinct().ToArray();
+
+                foreach (string name in _unique)
+                    UserList.Add(new TwitterUser{ 
+                        Name = name, 
+                        Follows = (_UserList.Where(u => u.Name == name).SelectMany(u => u.Follows)).Distinct().ToArray() ?? new string[0]
+                        });
                 
                 foreach (string line in txtTweets)
                 {
@@ -83,7 +92,7 @@ namespace FeedEx
                             // 2 determine length of string : prevent index out of range ex.
                             _length = (_tweet.Length > 140) ? 140 : _tweet.Length - 1;
                             // Assumes messages appear in sequence
-                            _TweetList.Add(new Tweet{ Name = _username, Message = _tweet});
+                            TweetList.Add(new Tweet{ Name = _username, Message = _tweet});
                         }
                         else throw new Exception($"No delimiter or user: Line({Array.IndexOf(txtTweets, line)}) ");
                     }
@@ -93,28 +102,23 @@ namespace FeedEx
                     }
                 }
 
-                this.UserList = _UserList;
-                this.TweetList = _TweetList;
-
                 if (Timer) 
                     Console.WriteLine($"Build() Time: {watch.ElapsedMilliseconds}ms | t:{watch.ElapsedTicks}\n");
             }
+            
             public void Render(bool Timer = false)
             {
                 Stopwatch watch = Stopwatch.StartNew();
                 
                 // Display the file contents by using a foreach loop.
-                foreach (string user in UserNames.OrderBy(n => n))
+                foreach (var user in UserList.OrderBy(n => n.Name))
                 {
-                    Console.WriteLine(user);
-
-                    _TempUser = UserList.Where(u => u.Name == user).FirstOrDefault();
-                    // Console.WriteLine($"\t follows {string.Join("|", _TempUser.Follows)}");
-
-                    if (_TempUser != null)
-                        foreach (var t in TweetList.Where(u => u.Name == user || _TempUser.Follows.Contains(u.Name)))
+                    Console.WriteLine(user.Name);
+                    
+                    foreach (var t in TweetList.Where(t => t.Name == user.Name || user.Follows.Contains(t.Name)))
                         Console.WriteLine($"\t @{t.Name}: {t.Message}");
                 }
+
                 if (Timer) 
                     Console.WriteLine($"\nRender() Time: {watch.ElapsedMilliseconds}ms | t:{watch.ElapsedTicks}");
             }
