@@ -3,9 +3,9 @@ Twitter feed programming exercise
 
 <table>
   <tr><td>
-<img src="https://docs.microsoft.com/en-us/dotnet/images/hub/netcore.svg" width="150">
+<img src="https://docs.microsoft.com/en-us/dotnet/images/hub/netcore.svg" width="100">
   </td><td>
-<img src="https://docs.microsoft.com/en-us/dotnet/images/hub/csharp.svg" width="150">
+<img src="https://docs.microsoft.com/en-us/dotnet/images/hub/csharp.svg" width="100">
   </td></tr>
 </table>
 
@@ -24,12 +24,10 @@ C:\FeedExUnzip\dotnet restore
 C:\FeedExUnzip\cd FeedEx
 C:\FeedExUnzip\FeedEx\dotnet run
 ```
-The expected output.
-For each user found in Users.txt, print the Username as well as all the tweets from the user as well as all the users they follow.
+The expected output is for each user found in Users.txt, to print the Username as well as all the tweets from the user as well as all the users they follow.
 
 ### Expected Output
-1. List all users found in Users.txt alphabetically
-2. for each user in the list
+* List all users found in Users.txt alphabetically and for each user in the list
   * Print the "name"
   * Print all "tweets" posted by the user as well as users he/she follows in the order they are found in the file Tweets.txt
 
