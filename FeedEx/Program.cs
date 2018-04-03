@@ -38,22 +38,22 @@ namespace FeedEx
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Error: incorrect loading of input data,\nMessage: {e.Message}");
-                Console.WriteLine("Press any key to exit...");
+                Console.WriteLine($"Error: loading input data.\n{e.Message}");
+                Console.WriteLine("\nPress any key to exit...");
                 Console.ReadKey();
                 return;
             }
 
-            Console.WriteLine("----------------------1981----------------------");
+            // Console.WriteLine("----------------------1981----------------------");
             FeedBuilder builder = new FeedBuilder();
             builder.Build(ref txtUsers, ref txtTweets, true);
             builder.Render(true);         
 
 
-            Console.WriteLine("----------------------2005----------------------");
-            Bouwer bou = new Bouwer();
-            bou.Build(ref txtUsers, ref txtTweets, true);
-            bou.Render(true);
+            // Console.WriteLine("----------------------2005----------------------");
+            // Bouwer bou = new Bouwer();
+            // bou.Build(ref txtUsers, ref txtTweets, true);
+            // bou.Render(true);
 
 
             // Keep the console window open in debug mode.
@@ -65,28 +65,4 @@ namespace FeedEx
     }
 }
 
-/* ASSUMPTIONS 
-
-    == User names ==
-    
-    Are unique strings.
-    Contain NO spaces.
-    Minimum length is one character.
-
-    <Users.txt> the word 'follows' appears even after a username even if the user does not follow anyone.
-
-
-
-    == Tweets ==
-    Do not have to trim() whitespace for tweet. 140 char.
-
-    <Tweets.txt> 
-        1. there are no empty tweets.
-        2. All tweets are by users found in <Users.txt>
-
-    Users.txt serves as master, for only tweets by users found therein will be written to the console.
-    If Tweets.txt contain messages by other Users not found in Users.txt they will be ignored.
-
-    On the use of Tuples vs. POCO classes : Tuples for performance / poco's for readable code...
-    Also use the var keyword sparingly
-*/
+/* Also see ASSUMPTIONS */
