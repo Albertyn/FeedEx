@@ -14,15 +14,16 @@ Download & Install [dotnet-core-2.0](https://www.microsoft.com/net/download/Wind
 
 #### Runnig the code
 * Download or clone the repository.
+* Edit the **appsettings.json** file to indicate the location of input files *Users.txt* and *Tweets.txt*
 * Open a command line & navigate to the folder containing the repository.
+* restore dependencies, buid the app and run it
 
 Command Line
 ```
-C:\Repo\dotnet restore
-
-C:\Repo\dotnet run
+C:\FeedExUnzip\dotnet restore
+C:\FeedExUnzip\cd FeedEx
+C:\FeedExUnzip\FeedEx\dotnet run
 ```
-
 The expected output.
 For each user found in Users.txt, print the Username as well as all the tweets from the user as well as all the users they follow.
 
