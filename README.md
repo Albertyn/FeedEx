@@ -3,9 +3,9 @@ Twitter feed programming exercise
 
 <table>
   <tr><td>
-<img src="https://docs.microsoft.com/en-us/dotnet/images/hub/netcore.svg" width="100">
+<img src="https://docs.microsoft.com/en-us/dotnet/images/hub/netcore.svg" width="80">
   </td><td>
-<img src="https://docs.microsoft.com/en-us/dotnet/images/hub/csharp.svg" width="100">
+<img src="https://docs.microsoft.com/en-us/dotnet/images/hub/csharp.svg" width="40">
   </td></tr>
 </table>
 
@@ -37,7 +37,7 @@ the list of (clients) is the product of a function applied to input *Users.txt*
 ##### Users.txt
 1. User names are unique strings,
 2. Contain **NO spaces** and 
-3. have a *minimum length of 1(one) character*.
+3. have a *minimum length of 2(two) characters*.
 4. The word 'follows' appears once per line; even if the user does not follow anyone.
 
 
