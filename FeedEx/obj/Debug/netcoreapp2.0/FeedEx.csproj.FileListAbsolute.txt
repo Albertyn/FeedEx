@@ -20,3 +20,4 @@ D:\DEVELOPMENT\github\FeedEx\FeedEx\obj\Debug\netcoreapp2.0\FeedEx.AssemblyInfoI
 D:\DEVELOPMENT\github\FeedEx\FeedEx\obj\Debug\netcoreapp2.0\FeedEx.AssemblyInfo.cs
 D:\DEVELOPMENT\github\FeedEx\FeedEx\obj\Debug\netcoreapp2.0\FeedEx.dll
 D:\DEVELOPMENT\github\FeedEx\FeedEx\obj\Debug\netcoreapp2.0\FeedEx.pdb
+D:\DEVELOPMENT\github\FeedEx\FeedEx\bin\Debug\netcoreapp2.0\appsettings.json

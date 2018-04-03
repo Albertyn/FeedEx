@@ -47,15 +47,30 @@ namespace FeedEx
 
             try 
             {            
+                FeedBuilder builder = new FeedBuilder();
+                builder.Build(ref txtUsers, ref txtTweets);
+                builder.Render();
+
+                /*
                 // tuple
                 FeedBuilder builder = new FeedBuilder();
-                builder.Build(ref txtUsers, ref txtTweets, false); // true); // uncomment to print duration 
-                builder.Render(false); // true); // uncomment to print duration
-                
+
                 // poco
-                // Bouwer bou = new Bouwer();
-                // bou.Build(ref txtUsers, ref txtTweets, true);
-                // bou.Render(true);
+                Bouwer bou = new Bouwer();
+
+                for(int i = 0; i < 10; i++)
+                {
+                    
+                builder.Build(ref txtUsers, ref txtTweets, true); // uncomment to print duration 
+                bou.Build(ref txtUsers, ref txtTweets, true);
+                
+                }
+
+                builder.Render(true); // uncomment to print duration
+                bou.Render(true);
+                 */
+                
+
             }
             catch (Exception e)
             {

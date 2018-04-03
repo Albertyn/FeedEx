@@ -10,88 +10,101 @@ namespace FeedEx
 {        class FeedBuilder
         {
             // Step 1 : Read Data into structures that are enumerable/queryable and stable            
-            public List<Tuple<string, string[]>> Users { get; private set; }
-            public List<Tuple<string, string>> Tweets { get; private set; }
+            // public List<Tuple<string, string[]>> Users { get; private set; }
+            public Tuple<string, string[]> [] Users { get; private set; }
+
+            // public List<Tuple<string, string>> Tweets { get; private set; }
+            public Tuple<string, string> [] Tweets { get; private set; }
+            public string[] Problems { get; private set; }
 
             public void Build(ref string[] txtUsers, ref string[] txtTweets, bool Timer = false)
             {
                 Stopwatch watch = Stopwatch.StartNew();
                 
-                Users = new List<Tuple<string, string[]>>(); // username / username[] (followers) 
-                Tweets = new List<Tuple<string, string>>(); // username / tweet
+                Users = new Tuple<string, string[]>[txtUsers.Length]; // username / username[] (followers) 
+                Tweets = new Tuple<string, string>[txtTweets.Length]; // username / tweet
 
-                List<Tuple<string, string[]>> Feed = new List<Tuple<string, string[]>>();
+                var _feed = new List<Tuple<string, string[]>>();
+                var _problems = new List<string>();
                 
                 int index, length;
                 string line, username, tweet;
-                string[] follows, uqnames;
+                string[] follows;
 
-                for (int i = 0; i < txtTweets.Length; i++) // Index Data 
-                {
-                    line = txtTweets[i];
-                    index = line.ToLower().IndexOf(">");
+                try{
 
-                    // Check for well formed line. 
-                    // 1. If ">" exists in string, then index is a positive number.
-                    // 2. Must not be at frist position in string or 0, else there would be no substring to read as username.
-                    if (index > 0)
+                    for (int i = 0; i < txtTweets.Length; i++) // Index Data 
                     {
-                        username = line.Substring(0, index).Trim();
-                        tweet = line.Substring(index + 2); // one space " "  + 1 ;)
+                        line = txtTweets[i];
+                        index = line.ToLower().IndexOf(">");
 
-                        // 2. determine length of string : prevent index out of range ex.
-                        length = (tweet.Length > 140) ? 140 : tweet.Length - 1;
+                        // Check for well formed line. 
+                        // 1. If ">" exists in string, then index is 0 or a positive number.
+                        // 2. Must not be at frist position in string or 0, else there would be no substring to read as username.
+                        if (index > 0) // not -1
+                        {
+                            username = line.Substring(0, index).Trim();
+                            tweet = line.Substring(index + 2); // one space " "  + 1 ;)
 
-                        Tweets.Add(new Tuple<string, string>(username, tweet.Substring(0, length)));
+                            // sanitize input 
+                            if (username.IndexOf(" ") > -1) throw new InvalidCastException(); 
+                            if (String.IsNullOrEmpty(tweet)) throw new InvalidOperationException();
+
+                            // determine length of string : prevent index out of range ex.
+                            length = (tweet.Length > 140) ? 140 : tweet.Length - 1;
+
+                            Tweets[i] = new Tuple<string, string>(username, tweet.Substring(0, length));
+                        }
                     }
-                }
 
-                for (int i = 0; i < txtUsers.Length; i++) // Build Master Index for Output
-                {
-                    line = txtUsers[i];
-                    index = line.ToLower().IndexOf("follows");
-
-                    // Check for well formed line. 
-                    // 1. If "follows" exists in string, then index is a positive number.
-                    // 2. Must not be at frist position in string or 0, else there would be no substring to read as name.
-                    if (index > 0)
+                    for (int i = 0; i < txtUsers.Length; i++) // Build Master Index for Output
                     {
-                        username = line.Substring(0, index).Trim();
-                        follows = line.Substring(index + 7).Replace(" ", "").Split(",");
+                        line = txtUsers[i];
+                        index = line.ToLower().IndexOf("follows");
 
-                        Feed.Add(new Tuple<string, string[]>(username, follows));
+                        // Check for well formed line. 
+                        // 1. If "follows" exists in string, then index is a positive number.
+                        // 2. Must not be at frist position in string or 0, else there would be no substring to read as name.
+                        if (index > 0)
+                        {
+                            username = line.Substring(0, index).Trim();
+                            follows = line.Substring(index + 7).Replace(" ", "").Split(",");
+
+                            Users[i] = new Tuple<string, string[]>(username, follows);
+                        }
                     }
-                }
-
-                // 3. Get List of unique usernames
-                uqnames = (Feed.Select(i => i.Item1).Concat(Feed.SelectMany(u => u.Item2))).Distinct().ToArray();
-                
-                // 4. Initialize Feed
-                for(int i = 0; i < uqnames.Length; i++)
-                {
-                    follows = (Feed.Where(u => u.Item1 == uqnames[i])).SelectMany(u => u.Item2).Distinct().ToArray();
+                    foreach (var uqname in unicorns())
+                        _feed.Add(new Tuple<string, string[]>(uqname,zombies(uqname)));
                     
-                    Users.Add(new Tuple<string, string[]>(uqnames[i], follows));
+                    // Asign the reduced/aggrigated Collection to Array member var
+                    Users = _feed.ToArray();
+
+                }
+                catch (Exception e)
+                {
+                    _problems.Add($"Type:{e.GetType().Name} > Message:{e.Message}");
                 }
 
+                this.Problems = _problems.ToArray();
                 if (Timer) 
                     Console.WriteLine($"Build() Time: {watch.ElapsedMilliseconds}ms | t:{watch.ElapsedTicks}\n");
             }
+            private string[] unicorns() => (Users.Select(i => i.Item1).Concat(Users.SelectMany(u => u.Item2))).Distinct().ToArray();
+
+            private string[] zombies(string uqname) => (Users.Where(u => u.Item1 == uqname)).SelectMany(u => u.Item2).Distinct().ToArray();
 
             public void Render(bool Timer = false)
             {
                 Stopwatch watch = Stopwatch.StartNew();
 
-                // Display the file contents by using a foreach loop.
-                foreach (var tu in Users.OrderBy(tu => tu.Item1))
+                // Init & Get List of unique usernames / foreach loop.
+                foreach (var u in Users.OrderBy(u => u.Item1))
                 {
-                    Console.WriteLine($"{tu.Item1}");
-                    // Console.WriteLine($"\t follows {string.Join("|", tu.Item2)}");
-
-                    foreach (var t in Tweets.Where(t => t.Item1 == tu.Item1 || tu.Item2.Contains(t.Item1)))
+                    Console.WriteLine(u.Item1);
+                    
+                    foreach (var t in Tweets.Where(t => t.Item1 == u.Item1 || u.Item2.Contains(t.Item1)))
                         Console.WriteLine($"\t @{t.Item1}: {t.Item2}");
                 }
-
                 if (Timer) 
                     Console.WriteLine($"\nRender() Time: {watch.ElapsedMilliseconds}ms | t:{watch.ElapsedTicks}");
             }
