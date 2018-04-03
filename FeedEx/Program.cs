@@ -44,20 +44,26 @@ namespace FeedEx
                 return;
             }
 
-            // Console.WriteLine("----------------------1981----------------------");
-            FeedBuilder builder = new FeedBuilder();
-            builder.Build(ref txtUsers, ref txtTweets, true);
-            builder.Render(true);         
 
+            try 
+            {            
+                // tuple
+                FeedBuilder builder = new FeedBuilder();
+                builder.Build(ref txtUsers, ref txtTweets, false); // true); // uncomment to print duration 
+                builder.Render(false); // true); // uncomment to print duration
+                
+                // poco
+                // Bouwer bou = new Bouwer();
+                // bou.Build(ref txtUsers, ref txtTweets, true);
+                // bou.Render(true);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error: processing feed data.\n{e.Message}");
+            }
 
-            // Console.WriteLine("----------------------2005----------------------");
-            // Bouwer bou = new Bouwer();
-            // bou.Build(ref txtUsers, ref txtTweets, true);
-            // bou.Render(true);
-
-
-            // Keep the console window open in debug mode.
-            Console.WriteLine("Press any key to exit.");
+            // Keep the console window open
+            Console.WriteLine("Press any key to exit...");
             System.Console.ReadKey();
         }
 
